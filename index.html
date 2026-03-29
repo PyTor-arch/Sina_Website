@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Für Sina - Eine kleine Reise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lofi-bg': '#f5f0eb',
+                        'lofi-pink': '#e8a598',
+                        'lofi-orange': '#f2b580',
+                        'lofi-green': '#8ca68c',
+                        'gold': '#d4af37',
+                        'gold-light': '#f3e5ab',
+                    },
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'serif'],
+                        'sans': ['Nunito', 'sans-serif'],
+                        'handwriting': ['Caveat', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f0eb 0%, #fbe6d4 50%, #f5ece9 100%);
+            color: #4a4a4a;
+            overflow-x: hidden;
+        }
+
+        .gold-border {
+            border: 2px solid #d4af37;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* 3D Polaroid Effect */
+        .polaroid {
+            background: white;
+            padding: 15px 15px 40px 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .polaroid.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .polaroid:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(2deg) scale(1.02);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.15);
+            z-index: 30;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Falling Petals */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(110vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        .petal {
+            position: fixed;
+            top: -10%;
+            pointer-events: none;
+            z-index: 5;
+            font-size: 20px;
+            animation: fall linear infinite;
+        }
+
+        /* Shadow Sprite Style */
+        .shadow-sprite {
+            position: absolute;
+            width: 100px; /* Base width */
+            height: auto;
+            cursor: pointer;
+            z-index: 100;
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+            pointer-events: auto;
+        }
+
+        .shadow-sprite:hover {
+            transform: scale(1.1);
+        }
+
+        .shadow-sprite:active {
+            transform: scale(0.9);
+            opacity: 0.5;
+        }
+
+        /* Click Interaction Elements */
+        .click-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            color: #e8a598;
+            font-size: 24px;
+            animation: burst 0.8s ease-out forwards;
+        }
+
+        @keyframes burst {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -150%) scale(2); opacity: 0; }
+        }
+
+        @media print {
+            body { background: white; }
+            .polaroid { 
+                box-shadow: none; 
+                border: 1px solid #eee; 
+                opacity: 1 !important; 
+                transform: none !important;
+                page-break-inside: avoid; 
+            }
+            .petal, .shadow-sprite, .click-heart { display: none; }
+        }
+
+        .sparkle {
+            position: absolute;
+            background: #d4af37;
+            border-radius: 50%;
+            opacity: 0.6;
+            box-shadow: 0 0 10px #f3e5ab;
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen relative overflow-x-hidden selection:bg-lofi-pink selection:text-white">
+
+    <!-- Background Elements -->
+    <div id="petal-container"></div>
+    <div id="shadow-container"></div>
+
+    <!-- Small Counter -->
+    <div id="counter" class="fixed bottom-4 left-4 bg-white/40 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] uppercase tracking-widest text-gray-400 z-[1000] border border-gray-100 pointer-events-none">
+        Rußmännchen gefunden: <span id="count-value">0</span>
+    </div>
+
+    <header class="max-w-4xl mx-auto pt-20 pb-12 px-6 text-center relative">
+        <div class="absolute top-10 left-10 w-3 h-3 sparkle rounded-full blur-[1px]"></div>
+        <div class="absolute top-20 right-20 w-4 h-4 sparkle rounded-full blur-[2px] opacity-40 bg-lofi-orange"></div>
+        
+        <h1 class="font-serif text-5xl md:text-6xl text-gray-800 mb-4 hover:scale-105 transition-transform duration-500 cursor-default">
+            Für <span class="text-gold italic">Sina</span>
+        </h1>
+        <p class="font-sans text-lg text-gray-500 max-w-2xl mx-auto tracking-wide reveal">
+            Ein kleiner Rückzugsort auf engstem Raum. Gefüllt mit Dingen, die so schön sind wie du.
+        </p>
+        
+        <div class="mt-8 flex justify-center gap-2 text-gold floating">
+            <span>✧</span><span>✦</span><span>✧</span>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+
+            <article class="polaroid rounded-sm relative" data-delay="0">
+                <div class="aspect-video bg-lofi-green/20 rounded-sm mb-4 overflow-hidden relative">
+                    <img src="HintergrundGhibli.jpg" alt="Ghibli Landschaft" class="w-full h-full object-cover relative z-10">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-lofi-pink/30 to-transparent mix-blend-overlay pointer-events-none z-20"></div>
+                </div>
+                <div class="px-2">
+                    <p class="font-handwriting text-2xl text-gray-700 leading-relaxed mb-4">
+                        "Ich habe endlich jemanden gefunden, den ich beschützen möchte... Dich."
+                    </p>
+                    <p class="text-xs uppercase tracking-widest text-gold font-bold">~ Das wandelnde Schloss</p>
+                </div>
+            </article>
+
+            <article class="polaroid rounded-sm relative md:mt-16" data-delay="200">
+                <div class="aspect-[4/3] bg-lofi-orange/20 rounded-sm mb-4 overflow-hidden relative">
+                    <img src="Krog.jpg" alt="Zelda Krog" class="w-full h-full object-cover relative z-10">
+                </div>
+                <div class="px-2">
+                    <p class="font-handwriting text-2xl text-gray-700 leading-relaxed mb-4">
+                        "Einige Blumen blühen nur in der Stille, aber ihre Wurzeln überdauern jeden Sturm."
+                    </p>
+                    <p class="text-xs uppercase tracking-widest text-gold font-bold">~ The Legend of Zelda</p>
+                </div>
+            </article>
+
+            <article class="polaroid rounded-sm relative" data-delay="100">
+                <div class="aspect-square bg-blue-50 rounded-sm mb-4 overflow-hidden relative">
+                    <img src="calcifer.jpg" alt="Calcifer" class="w-full h-full object-cover relative z-10">
+                </div>
+                <div class="px-2">
+                    <p class="font-handwriting text-2xl text-gray-700 leading-relaxed mb-4">
+                        "Egal wie anstrengend der Weg wird, möge dein inneres Feuer niemals erlöschen."
+                    </p>
+                    <p class="text-xs uppercase tracking-widest text-gold font-bold">~ Calcifer (und ein bisschen von mir)</p>
+                </div>
+            </article>
+
+            <article class="polaroid rounded-sm relative md:mt-12" data-delay="300">
+                <div class="aspect-video bg-lofi-pink/10 rounded-sm mb-4 overflow-hidden relative">
+                    <img src="chihiro.jpeg" alt="Chihiro und Haku" class="w-full h-full object-cover relative z-10">
+                </div>
+                <div class="px-2">
+                    <p class="font-handwriting text-2xl text-gray-700 leading-relaxed mb-4">
+                        "Einmal getroffen, vergisst man sich nie. Man muss sich nur erinnern."
+                    </p>
+                    <p class="text-xs uppercase tracking-widest text-gold font-bold">~ Chihiros Reise ins Zauberland</p>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="max-w-3xl mx-auto px-6 py-20 text-center">
+        <div class="relative w-full mx-auto pb-12">
+            
+            <div class="gold-border p-10 rounded-lg bg-white/90 relative border-dashed border-2 z-10 shadow-lg group hover:bg-white transition-colors duration-500">
+                <!-- Interactive element: Pulsing Icon -->
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#f5f0eb] px-4 text-gold text-4xl animate-bounce">
+                    ♨️
+                </div>
+                
+                <p class="text-xs uppercase tracking-widest text-lofi-orange font-bold mb-2 mt-4">Offizielles Ticket</p>
+                <h2 class="font-serif text-3xl md:text-4xl text-gray-800 mb-8 text-gold group-hover:scale-105 transition-transform duration-500">Gutschein für die Therme</h2>
+                
+                <p class="font-handwriting text-2xl text-gray-700 leading-relaxed mb-6">
+                    "Eine heiße Quelle, um all deine Herzen wieder aufzufüllen..." 
+                </p>
+
+                <p class="font-sans text-gray-600 leading-relaxed mb-6">
+                    Weil unsere Wohnung leider kein eigenes Spa hat und du dir nach dem Klinik-Alltag eine echte Pause verdienst. 
+                    Ein gemeinsamer Tag voller Entspannung, warmem Wasser und Ruhe, ohne dabei für Yubaba im Badehaus arbeiten zu müssen!
+                </p>
+
+                <div class="mt-8 border-t border-gold/30 pt-6">
+                    <p class="font-sans text-sm text-gray-500 mb-2">Ausgestellt von & Einzulösen bei:</p>
+                    <p class="font-handwriting text-3xl text-gold">
+                        Deinem Leon
+                    </p>
+                </div>
+            </div>
+
+            <!-- Ohngesicht is now watching the interaction -->
+            <img src="GeminiOhngesicht.png" 
+                 class="absolute -bottom-8 -right-6 md:-bottom-12 md:-right-10 w-40 md:w-64 transform -rotate-[12deg] pointer-events-none drop-shadow-2xl z-50 floating" 
+                 alt="Ohngesicht">
+
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Reveal Animation
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.getAttribute('data-delay') || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.polaroid').forEach(el => observer.observe(el));
+
+        // Falling Petals System
+        const petalContainer = document.getElementById('petal-container');
+        const petalIcons = ['🌸', '✨', '🍃', '🤍'];
+
+        function createPetal() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.innerText = petalIcons[Math.floor(Math.random() * petalIcons.length)];
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            petal.style.opacity = Math.random();
+            
+            petalContainer.appendChild(petal);
+            
+            setTimeout(() => {
+                petal.remove();
+            }, 8000);
+        }
+
+        setInterval(createPetal, 1500);
+
+        // Click Interaction: Hearts
+        document.addEventListener('click', (e) => {
+            const heart = document.createElement('div');
+            heart.className = 'click-heart';
+            heart.innerText = '❤';
+            heart.style.left = e.clientX + 'px';
+            heart.style.top = e.clientY + 'px';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 800);
+        });
+
+        // Shadow Sprite Interaction
+        const shadowContainer = document.getElementById('shadow-container');
+        const countValueEl = document.getElementById('count-value');
+        const shadowImages = ['shadowHiding.png', 'shadowSitting.png'];
+        const numShadows = 4;
+        const activeSprites = [];
+        let foundCount = 0;
+
+        function getRandomPosition() {
+            const padding = 150;
+            const pageWidth = window.innerWidth;
+            const pageHeight = Math.max(
+                document.body.scrollHeight, 
+                document.documentElement.scrollHeight,
+                document.body.offsetHeight, 
+                document.documentElement.offsetHeight,
+                document.body.clientHeight, 
+                document.documentElement.clientHeight
+            );
+
+            let x, y, isTooClose;
+            let attempts = 0;
+
+            do {
+                x = Math.random() * (pageWidth - padding * 2) + padding;
+                y = Math.random() * (pageHeight - padding * 2) + padding;
+                isTooClose = activeSprites.some(s => {
+                    const dx = s.x - x;
+                    const dy = s.y - y;
+                    return Math.sqrt(dx*dx + dy*dy) < 350;
+                });
+                attempts++;
+            } while (isTooClose && attempts < 20);
+
+            return { x, y };
+        }
+
+        function createShadowSprite() {
+            const sprite = document.createElement('img');
+            const pos = getRandomPosition();
+            const randomImg = shadowImages[Math.floor(Math.random() * shadowImages.length)];
+            const randomScale = 0.6 + Math.random() * 0.7;
+            const randomRotate = (Math.random() - 0.5) * 20;
+            
+            sprite.src = randomImg;
+            sprite.className = 'shadow-sprite';
+            sprite.style.left = pos.x + 'px';
+            sprite.style.top = pos.y + 'px';
+            sprite.style.transform = `scale(${randomScale}) rotate(${randomRotate}deg)`;
+            
+            const spriteObj = { el: sprite, x: pos.x, y: pos.y };
+            activeSprites.push(spriteObj);
+
+            sprite.onclick = (e) => {
+                e.stopPropagation();
+                foundCount++;
+                countValueEl.innerText = foundCount;
+                teleportSprite(spriteObj);
+            };
+            
+            shadowContainer.appendChild(sprite);
+        }
+
+        function teleportSprite(spriteObj) {
+            spriteObj.el.style.opacity = '0';
+            spriteObj.el.style.transform += ' scale(0)';
+            
+            setTimeout(() => {
+                const pos = getRandomPosition();
+                // Guaranteed toggle between Hiding and Sitting
+                const currentImg = spriteObj.el.src.split('/').pop();
+                const nextImg = shadowImages.find(img => img !== currentImg) || shadowImages[0];
+                
+                const randomScale = 0.6 + Math.random() * 0.7;
+                const randomRotate = (Math.random() - 0.5) * 20;
+
+                spriteObj.x = pos.x;
+                spriteObj.y = pos.y;
+                spriteObj.el.src = nextImg;
+                spriteObj.el.style.left = pos.x + 'px';
+                spriteObj.el.style.top = pos.y + 'px';
+                spriteObj.el.style.transform = `scale(${randomScale}) rotate(${randomRotate}deg)`;
+                spriteObj.el.style.opacity = '1';
+            }, 400);
+        }
+
+        // Initialize shadows after page is fully loaded to get correct height
+        window.addEventListener('load', () => {
+            for (let i = 0; i < numShadows; i++) {
+                createShadowSprite();
+            }
+        });
+    </script>
+</body>
+
+</body>
+</html>
